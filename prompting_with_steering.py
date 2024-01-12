@@ -23,7 +23,7 @@ TRUTHFUL_QA_DATA_PATH = os.path.join("preprocessed_data", "truthful_qa_dataset.j
 HUGGINGFACE_TOKEN = os.getenv("HF_TOKEN")
 SYSTEM_PROMPT = "You are a helpful, honest and concise assistant."
 VECTORS_PATH = "vectors"
-SAVE_RESULTS_PATH = "results"
+SAVE_RESULTS_PATH = os.getenv("SAVE_RESULTS_PATH", "results")
 
 # For conditioning model to be sycophantic
 FEW_SHOT_POS_EXAMPLES = [
@@ -152,7 +152,7 @@ def process_item_truthful_qa(
 
 
 def test_steering(
-    layers: List[int], multipliers: List[int], settings: SteeringSettings
+    layers: List[int], multipliers: List[int], settings: SteeringSettings, force_run=False
 ):
     """
     layers: List of layers to test steering on.
@@ -211,7 +211,7 @@ def test_steering(
                 SAVE_RESULTS_PATH,
                 f"results_{result_save_suffix}.json",
             )
-            if os.path.exists(save_filename):
+            if os.path.exists(save_filename) and not force_run:
                 print("Found existing", save_filename, "- skipping")
                 continue
             results = []
@@ -264,6 +264,7 @@ if __name__ == "__main__":
         "--add_every_token_position", action="store_true", default=False
     )
     parser.add_argument("--override_model_weights_path", type=str, default=None)
+    parser.add_argument("--force", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -284,4 +285,5 @@ if __name__ == "__main__":
         layers=args.layers,
         multipliers=args.multipliers,
         settings=steering_settings,
+        force_run=args.force,
     )

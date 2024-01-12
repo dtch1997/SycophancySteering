@@ -16,6 +16,8 @@ import argparse
 from utils.helpers import SteeringSettings
 
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))
+SAVE_RESULTS_PATH = os.getenv("SAVE_RESULTS_PATH", "results")
+SAVE_ANALYSIS_PATH = os.getenv("SAVE_ANALYSIS_PATH", "analysis")
 
 
 def get_data(
@@ -24,9 +26,9 @@ def get_data(
     settings: SteeringSettings,
 ) -> Dict[str, Any]:
     if settings.type != "out_of_distribution":
-        directory = os.path.join(WORKING_DIR, "results")
+        directory = os.path.join(WORKING_DIR, SAVE_RESULTS_PATH)
     else:
-        directory = os.path.join(WORKING_DIR, "analysis", "scored_results")
+        directory = os.path.join(WORKING_DIR, SAVE_ANALYSIS_PATH, "scored_results")
     filenames = settings.filter_result_files_by_suffix(
         directory, layer=layer, multiplier=multiplier
     )
@@ -74,7 +76,7 @@ def plot_in_distribution_data_for_layer(
     settings.few_shot = None
     save_to = os.path.join(
         WORKING_DIR,
-        "analysis",
+        SAVE_ANALYSIS_PATH,
         f"{settings.make_result_save_suffix(layer=layer)}.svg",
     )
     plt.clf()
@@ -119,7 +121,7 @@ def plot_truthful_qa_data_for_layer(
 ):
     save_to = os.path.join(
         WORKING_DIR,
-        "analysis",
+        SAVE_ANALYSIS_PATH,
         f"{settings.make_result_save_suffix(layer=layer)}.svg",
     )
     res_per_category = defaultdict(list)
@@ -165,7 +167,7 @@ def plot_out_of_distribution_data(
 ):
     save_to = os.path.join(
         WORKING_DIR,
-        "analysis",
+        SAVE_ANALYSIS_PATH,
         f"{settings.make_result_save_suffix(layer=layer)}.svg",
     )
     plt.clf()
@@ -204,7 +206,7 @@ def plot_per_layer_data_in_distribution(
     plt.figure(figsize=(6, 6))
     save_to = os.path.join(
         WORKING_DIR,
-        "analysis",
+        SAVE_ANALYSIS_PATH,
         f"{settings.make_result_save_suffix()}.svg",
     )
     # Get a colormap and generate a sequence of colors from that colormap
