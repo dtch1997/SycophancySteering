@@ -131,13 +131,15 @@ class LlamaWrapper:
             self.model_name_path, use_auth_token=token
         )
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.model_name_path, use_auth_token=token
+            self.model_name_path, use_auth_token=token,
+            load_in_8bit = True
         )
         if override_model_weights_path is not None:
             self.model.load_state_dict(t.load(override_model_weights_path))
-        if size != "7b":
-            self.model = self.model.half()
-        self.model = self.model.to(self.device)
+        # NOTE: model.to() not compatible with loading in 8-bit
+        # if size != "7b":
+        #     self.model = self.model.half()
+        # self.model = self.model.to(self.device)
         self.END_STR = t.tensor(self.tokenizer.encode("[/INST]")[1:]).to(self.device)
         for i, layer in enumerate(self.model.model.layers):
             self.model.model.layers[i] = BlockOutputWrapper(
